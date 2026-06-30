@@ -1,0 +1,98 @@
+/******************************************************************************
+
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+#include<bits/stdc++.h>
+using namespace std;
+
+
+void dfs(int node, vector<int>& vis, vector<vector<int>>& adj, stack<int>& st) {
+	vis[node] = 1;
+
+	for(auto it: adj[node]) {
+		if(vis[it] == 0) dfs(it, vis, adj, st);
+	}
+
+	st.push(node);
+}
+
+void dfs2(int node, vector<int>& vis, vector<vector<int>>& adj, vector<int>& cmp) {
+	vis[node] = 1;
+	cmp.push_back(node);
+	for(auto it: adj[node]) {
+		if(vis[it] == 0) dfs2(it, vis, adj, cmp);
+	}
+}
+
+int main()
+{
+	int n, m;
+	cin >> n >> m;
+	vector<vector<int>> edges;
+	for(int i=0; i<m; i++) {
+		int temp, tem1;
+		cin >> temp >> tem1;
+		edges.push_back({temp, tem1});
+	}
+
+	vector<vector<int>> adj(n + 1);
+
+	for(auto edge : edges)
+		adj[edge[0]].push_back(edge[1]);
+
+	stack<int> st;
+	vector<int> vis(n+1, 0);
+
+	for(int i = 1; i <= n; i++) {
+		if(!vis[i])
+			dfs(i, vis, adj, st);
+	}
+
+	vector<vector<int>> rev(n+1);
+
+	for(auto edge : edges)
+		rev[edge[1]].push_back(edge[0]);
+
+	vector<int> vis2(n+1, 0);
+	int cnt = 0;
+	vector<vector<int>> cmp;
+
+	while(!st.empty()) {
+
+		int node = st.top();
+		st.pop();
+
+		vector<int> cmpParts;
+
+		if(!vis2[node]) {
+			cnt++;
+			dfs2(node, vis2, rev, cmpParts);
+		}
+
+		if(cmpParts.size() != 0) cmp.push_back(cmpParts);
+	}
+
+	vector<int> ret(n+1);
+	int cnt1 = 1;
+	for(int i=0; i<cmp.size(); i++) {
+	    
+		if(cmp[i].size() != 0) {
+			for(auto it: cmp[i]) {
+				ret[it] = cnt1;
+			}
+			cnt1++;
+		}
+	}
+
+	cout << cnt << endl;
+	for(int i=1; i<=n; i++) cout << ret[i] << " ";
+	cout << endl;
+
+
+	return 0;
+}
